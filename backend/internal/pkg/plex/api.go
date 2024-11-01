@@ -136,6 +136,7 @@ func GetAllVideos(ctx context.Context, c Client, sectionId string) ([]VideoShort
 	if err := xml.Unmarshal(bodyBytes, &container); err != nil {
 		span.RecordError(err)
 		span.SetAttributes(attribute.String("received bytes: ", string(bodyBytes)))
+		log.Println("expected MediaContainer but received ", string(bodyBytes))
 		return nil, err
 	}
 	log.Printf("total count: %v\n", len(container.Videos))
