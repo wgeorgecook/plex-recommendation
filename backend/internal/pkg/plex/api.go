@@ -3,12 +3,13 @@ package plex
 import (
 	"context"
 	"encoding/xml"
-	"github.com/wgeorgecook/plex-recommendation/internal/pkg/telemetry"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/wgeorgecook/plex-recommendation/internal/pkg/telemetry"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
 
 const allMovies = true
@@ -106,7 +107,6 @@ func GetRecentlyPlayed(ctx context.Context, c Client, sectionId string, limit in
 	return shorts, nil
 }
 
-
 func GetAllVideos(ctx context.Context, c Client, sectionId string) ([]VideoShort, error) {
 	ctx, span := telemetry.StartSpan(ctx, telemetry.WithSpanName("GetAllVideos"))
 	defer span.End()
@@ -135,6 +135,7 @@ func GetAllVideos(ctx context.Context, c Client, sectionId string) ([]VideoShort
 	var container MediaContainer
 	if err := xml.Unmarshal(bodyBytes, &container); err != nil {
 		span.RecordError(err)
+		span.SetAttributes(attribute.String("received bytes: ", string(bodyBytes)))
 		return nil, err
 	}
 	log.Printf("total count: %v\n", len(container.Videos))
